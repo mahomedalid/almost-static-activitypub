@@ -14,6 +14,11 @@ Adds an activity pub simple server to a static site using dotnet azure functions
 * Posts should appear in Mastodon instances.  **(COMPLETE)**
 * Posts can be "replied" in Mastodon, and these replies would appear in my blog site.  **(COMPLETE)**
 * Should use the domain of the blog. **(COMPLETE)**
+* Support for multiple/accounts/tags 
+* Multiple levels replies
+* Generating followers json
+* Allow to publish notes as threads
+* Allow to pre-visualize a note
 
 ## Alternatives
 
