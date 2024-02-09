@@ -27,8 +27,7 @@ I found these alternatives that may be more easier/simple of implement, or are c
 * [Adding ActivityPub to a Static Site in Vercel](https://paul.kinlan.me/adding-activity-pub-to-your-static-site/).
 * [Adding comments to your Static Site with Mastodon](https://carlschwan.eu/2020/12/29/adding-comments-to-your-static-blog-with-mastodon/).
 
-## Design
+## Getting Started
 
+Follow the instructions on [these series to implement activitypub in a static site](https://maho.dev/2024/02/a-guide-to-implement-activitypub-in-a-static-site-or-any-website/).
 
-
-```
