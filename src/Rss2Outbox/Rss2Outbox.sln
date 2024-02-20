@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.8.34511.84
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rss2Outbox", "Rss2Outbox.csproj", "{B27C7467-1143-4642-A265-6B8129D51986}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B27C7467-1143-4642-A265-6B8129D51986}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B27C7467-1143-4642-A265-6B8129D51986}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B27C7467-1143-4642-A265-6B8129D51986}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B27C7467-1143-4642-A265-6B8129D51986}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {9E69A588-9F2F-4580-8C73-16BE58157B00}
+	EndGlobalSection
+EndGlobal
