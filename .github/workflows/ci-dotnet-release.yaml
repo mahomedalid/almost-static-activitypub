@@ -2,7 +2,7 @@ name: .NET Release
 
 on:
   release:
-    types: [published, created, prereleased, released]
+    types: [published]
 
 jobs:
   release:
