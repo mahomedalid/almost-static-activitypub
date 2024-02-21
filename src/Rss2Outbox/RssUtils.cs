@@ -1,6 +1,13 @@
+using System;
 using System.Text;
 using System.Numerics;
 using System.Security.Cryptography;
+using System.Collections.Generic;
+using System.Text.Json;
+using System.Xml.Linq;
+using System.CommandLine.Parsing;
+using System.CommandLine;
+using System.Linq;
 
 namespace Rss2Outbox
 {
@@ -12,7 +19,9 @@ namespace Rss2Outbox
 
             var tags = string.Empty;
 
-            if (item?.Tags?.Any() ?? false)
+            var itemTags = item?.Tags as List<string> ?? [];
+
+            if (itemTags?.Count > 0)
             {
                 foreach (var tag in item?.Tags ?? Enumerable.Empty<string>())
                 {
@@ -97,7 +106,9 @@ namespace Rss2Outbox
 
             var baseTagUrl = $"{outboxConfig.Domain}/tags";
 
-            if (item?.Tags?.Any() ?? false)
+            var itemTags = item?.Tags as List<string> ?? [];
+
+            if (itemTags?.Count > 0)
             {
                 foreach (var tag in item?.Tags ?? Enumerable.Empty<string>())
                 {

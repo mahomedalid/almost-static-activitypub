@@ -1,5 +1,4 @@
-﻿// Replace 'your_rss_feed.xml' with the actual path or URL of your RSS feed
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text.Json;
 using System.Xml.Linq;
@@ -128,6 +127,12 @@ static void GenerateOutbox(ILogger logger, string input, OutboxConfig config)
 
     var orderedItems = new List<dynamic>();
 
+    // Create the folder config.NotesFullPath if does not exists
+    if (!Directory.Exists(config.NotesFullPath))
+    {
+        Directory.CreateDirectory(config.NotesFullPath);
+    }
+    
     foreach (var item in items)
     {
         var note = RssUtils.GetNote(item, config);
