@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
-using System.Text.Json.Serialization;
-using System.Threading.Tasks;
+﻿using System.Text.Json.Serialization;
 
 namespace ActivityPubDotNet.Core
 {
@@ -18,6 +12,11 @@ namespace ActivityPubDotNet.Core
             public string Id { get; set; } = default!;
             public string Owner { get; set; } = default!;
             public string PublicKeyPem { get; set; } = default!;
+        }
+
+        public class EndpointsDefinition
+        {
+            public string? SharedInbox { get; set; } = default!;
         }
 
         [JsonPropertyName("@context")]
@@ -35,5 +34,7 @@ namespace ActivityPubDotNet.Core
         public string Summary { get; set; } = default!;
         public string Url { get; set; } = default!;
         public PublicKeyDefinition PublicKey { get; set; } = default!;
+
+        public EndpointsDefinition Endpoints { get; set; } = default!;
     }
 }
