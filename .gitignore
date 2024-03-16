@@ -351,3 +351,7 @@ MigrationBackup/
 .ionide/
 
 myprofile.db
+
+local.settings.json
+
+src/ActivityPubFunctions/Properties/
