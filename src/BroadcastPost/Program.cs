@@ -13,10 +13,8 @@ var notePathOption = new Option<string>("--notePath")
     IsRequired = true
 };
 
-var domain = Environment.GetEnvironmentVariable("ACTIVITYPUB_DOTNET_DOMAIN")!;
 var privateKey = Environment.GetEnvironmentVariable("ACTIVITYPUB_DOTNET_PRIVATEKEY")!;
 var keyId = Environment.GetEnvironmentVariable("ACTIVITYPUB_DOTNET_KEYID")!;
-
 var connectionString = Environment.GetEnvironmentVariable("ACTIVITYPUB_DOTNET_STORAGE_CONNECTIONSTRING")!;
 
 var rootCommand = new RootCommand();
@@ -29,7 +27,7 @@ var options = new JsonSerializerOptions
 
 rootCommand.SetHandler(async (string notePath) =>
 {
-    Console.WriteLine($"Reading {notePath} for domain {domain}");
+    Console.WriteLine($"Reading {notePath}");
 
     string jsonNote = File.ReadAllText(notePath);
 
@@ -38,10 +36,13 @@ rootCommand.SetHandler(async (string notePath) =>
     var published = DateTime.UtcNow.ToString("o");
     note["published"] = published;
 
+    var noteUri = note["id"]?.ToString();
+    var attributedTo = note["attributedTo"]?.ToString();
+   
     // Deserialize the JSON content into an object
     var createNote = new CreateNote() {
-        Id = $"{domain}/notes/{GetNoteId(notePath)}/create",
-        Actor = $"{domain}/@blog",
+        Id = $"{noteUri}/create",
+        Actor = attributedTo!,
         Published = published,
         Object = note
     };    
