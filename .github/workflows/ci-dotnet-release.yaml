@@ -40,6 +40,8 @@ jobs:
           # Build everything
           dotnet publish src/Rss2Outbox/Rss2Outbox.csproj --runtime "${{ matrix.target }}" -c Release -o "$release_name"
 
+          dotnet publish src/BroadcastPost/BroadcastPost.csproj --runtime "${{ matrix.target }}" -c Release -o "$release_name"
+
           # Pack files
           if [ "${{ matrix.target }}" == "win-x64" ]; then
             # Pack to zip for Windows
