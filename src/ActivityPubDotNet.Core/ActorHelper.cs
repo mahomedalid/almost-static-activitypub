@@ -73,6 +73,8 @@ namespace ActivityPubDotNet.Core
                 // Base64 encode the signature
                 string signature = Convert.ToBase64String(signatureBytes);
 
+                Logger?.LogInformation($"Using key: {this._keyId}");
+
                 // Build the HTTP signature header
                 // string header = $"keyId=\"{privateKeyId}\",headers=\"(request-target) host date digest\",signature=\"{signature}\",algorithm=\"rsa-sha256\"";
                 string header = $"keyId=\"{this._keyId}\",headers=\"(request-target) host date digest\",signature=\"{signature}\",algorithm=\"rsa-sha256\"";
@@ -86,14 +88,10 @@ namespace ActivityPubDotNet.Core
                     client.DefaultRequestHeaders.Add("Signature", header);
                     client.DefaultRequestHeaders.Add("Digest", digest);
 
-                    Console.WriteLine(document);
-                    Console.WriteLine(date);
-                    Console.WriteLine(digest);
-                    Console.WriteLine(header);
-
+                    Logger?.LogInformation(document);
+                    
                     // Make the POST request
                     var response = await client.PostAsync(url, new StringContent(document, Encoding.UTF8, "application/activity+json"));
-
 
                     // Print the response
                     var responseString = await response.Content.ReadAsStringAsync();

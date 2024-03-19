@@ -7,6 +7,14 @@ using ActivityPubDotNet;
 using ActivityPubDotNet.Core;
 using Azure;
 using System.Text.Json.Nodes;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+
+var serviceCollection = new ServiceCollection();
+
+using var serviceProvider = serviceCollection.BuildServiceProvider();
+
+var loggerFactory = serviceProvider.GetService<ILoggerFactory>()!;
 
 var notePathOption = new Option<string>("--notePath")
 {
@@ -27,7 +35,9 @@ var options = new JsonSerializerOptions
 
 rootCommand.SetHandler(async (string notePath) =>
 {
-    Console.WriteLine($"Reading {notePath}");
+    var logger = loggerFactory.CreateLogger<Program>();
+
+    logger?.LogInformation($"Reading {notePath}");
 
     string jsonNote = File.ReadAllText(notePath);
 
@@ -55,15 +65,16 @@ rootCommand.SetHandler(async (string notePath) =>
 
     Pageable<Follower> queryResultsFilter = followersTable.Query<Follower>();
 
-    Console.WriteLine($"Note to be sent: {createNoteJson}");
+    logger?.LogInformation($"Note to be sent: {createNoteJson}");
 
     var endpointsAlreadySent = new List<string>();
 
     var actorHelper = new ActorHelper(privateKey, keyId);
+    actorHelper.Logger = logger;
 
     foreach (var qEntity in queryResultsFilter)
     {
-        Console.WriteLine($"{qEntity.ActorUri}");
+        logger?.LogInformation($"Fetching follower actor information: {qEntity.ActorUri}");
         string endpointUri = string.Empty;
 
         try
@@ -71,15 +82,17 @@ rootCommand.SetHandler(async (string notePath) =>
             var actor = await ActorHelper.FetchActorInformationAsync(qEntity.ActorUri);
             endpointUri = actor.Endpoints.SharedInbox ?? actor.Inbox;
         } catch (Exception ex) {
-            Console.WriteLine(ex);
+            logger?.LogError(ex.ToString());
             var actorUri = new Uri(qEntity.ActorUri);
             endpointUri = actorUri.GetLeftPart(UriPartial.Authority) + "/inbox";
         }
-            
+
+        logger?.LogInformation($"Inbox: {endpointUri}");
+
         try {
             if (endpointsAlreadySent.Contains(endpointUri))
             {
-                Console.WriteLine($"Skipping {endpointUri}");
+                logger?.LogInformation($"Skipping {endpointUri}");
                 continue;
             }
 
@@ -89,7 +102,7 @@ rootCommand.SetHandler(async (string notePath) =>
         }
         catch (Exception ex)
         {
-            Console.WriteLine(ex);
+            logger?.LogError(ex.ToString());
         }
     }
 
