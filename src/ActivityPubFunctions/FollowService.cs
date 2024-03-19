@@ -8,7 +8,7 @@ namespace ActivityPubDotNet
 {
     public class FollowService(TableServiceClient tableServiceClient, ActorHelper actorHelper)
     {
-        private readonly ILogger? _logger = default;
+        public ILogger? Logger { get; set; }
 
         private readonly string FollowersTable = "followers";
 
@@ -31,13 +31,13 @@ namespace ActivityPubDotNet
         {
             await _tableServiceClient.CreateTableIfNotExistsAsync(FollowersTable);
 
-            _logger?.LogDebug($"Follow request from: {message.Actor}");
+            Logger?.LogDebug($"Follow request from: {message.Actor}");
             
             var follower = Follower.GetFromMessage(message);
 
             var followersTable = _tableServiceClient.GetTableClient(FollowersTable);
 
-            _logger?.LogDebug($"Searching for existing follower {follower.PartitionKey} {follower.RowKey}");
+            Logger?.LogDebug($"Searching for existing follower {follower.PartitionKey} {follower.RowKey}");
 
             try
             {
@@ -45,12 +45,12 @@ namespace ActivityPubDotNet
 
                 if (existing != null)
                 {
-                    _logger?.LogDebug($"Follower already exists");
+                    Logger?.LogDebug($"Follower already exists");
                 }
             }
             catch (Azure.RequestFailedException e)
             {
-                _logger?.LogDebug($"Adding follower, it does not exists: {e}");
+                Logger?.LogDebug($"Adding follower, it does not exists: {e}");
 
                 await followersTable.AddEntityAsync(follower);
             }
@@ -60,13 +60,13 @@ namespace ActivityPubDotNet
         {
             await _tableServiceClient.CreateTableIfNotExistsAsync(FollowersTable);
 
-            _logger?.LogDebug($"Unfollow request from: {message.Actor}");
+            Logger?.LogDebug($"Unfollow request from: {message.Actor}");
 
             var follower = Follower.GetFromMessage(message);
 
             var followersTable = _tableServiceClient.GetTableClient(FollowersTable);
 
-            _logger?.LogDebug($"Searching for existing follower {follower.PartitionKey} {follower.RowKey}");
+            Logger?.LogDebug($"Searching for existing follower {follower.PartitionKey} {follower.RowKey}");
 
             try
             {
@@ -77,7 +77,7 @@ namespace ActivityPubDotNet
             }
             catch (Azure.RequestFailedException e)
             {
-                _logger?.LogDebug($"Follower does not exists in our table, or could not be deleted {e}");
+                Logger?.LogDebug($"Follower does not exists in our table, or could not be deleted {e}");
             }
         }
 
@@ -89,7 +89,7 @@ namespace ActivityPubDotNet
             // Actor is the account who wants to follow
             var actor = await ActorHelper.FetchActorInformationAsync(message.Actor);
 
-            _logger?.LogInformation($"Actor: {actor.Id} - {actor.Name} - {actor.Url} => Target: {target}");
+            Logger?.LogInformation($"Actor: {actor.Id} - {actor.Name} - {actor.Url} => Target: {target}");
 
             //'#accepts/follows/'
             var acceptRequest = new AcceptRequest()

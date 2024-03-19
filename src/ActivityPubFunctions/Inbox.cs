@@ -54,6 +54,9 @@ namespace ActivityPubDotNet
 
             try
             {
+                _followService.Logger = _logger;
+                _actorHelper.Logger = _logger;
+
                 if (message?.IsFollow() ?? false)
                 {
                     await _followService.Follow(message);
