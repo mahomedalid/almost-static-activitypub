@@ -105,7 +105,12 @@ namespace ActivityPubDotNet
                 }
             };
 
-            await _actorHelper.SendSignedRequest(acceptRequest, new Uri(actor.Inbox), _logger);
+            var options = new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            };
+
+            await _actorHelper.SendSignedRequest(JsonSerializer.Serialize(acceptRequest, options), new Uri(actor.Inbox), _logger);
 
             return acceptRequest;
         }
