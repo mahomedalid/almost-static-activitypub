@@ -81,7 +81,7 @@ namespace ActivityPubDotNet
 
                     _logger?.LogInformation($"Sending accept request to {actor.Inbox} - {document}");
 
-                    await _actorHelper.SendSignedRequest(document, new Uri(actor.Inbox), _logger);
+                    await _actorHelper.SendSignedRequest(document, new Uri(actor.Inbox));
                 }
                 else if (message?.IsCreateActivity() ?? false)
                 {
