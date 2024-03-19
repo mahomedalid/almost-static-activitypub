@@ -9,8 +9,11 @@ using Azure;
 using System.Text.Json.Nodes;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Console;
 
 var serviceCollection = new ServiceCollection();
+
+ConfigureServices(serviceCollection, args);
 
 using var serviceProvider = serviceCollection.BuildServiceProvider();
 
@@ -114,22 +117,18 @@ var result = await rootCommand.InvokeAsync(args);
 
 return result;
 
-static string GetNoteId(string notePath)
+static void ConfigureServices(ServiceCollection serviceCollection, string[] args)
 {
-    // Split the notePath by "/"
-    string[] parts = notePath.Split(new char[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
-    
-    // Check if the notePath has at least one "/"
-    if (parts.Length > 0)
-    {
-        // Return the last part of the notePath
-        return parts[parts.Length - 1];
-    }
-    else
-    {
-        // If there are no "/", return the whole notePath
-        return notePath;
-    }
+    serviceCollection
+        .AddLogging(configure =>
+        {
+            configure.AddSimpleConsole(options => options.TimestampFormat = "hh:mm:ss ");
+
+            if (args.Any("--debug".Contains))
+            {
+                configure.SetMinimumLevel(LogLevel.Debug);
+            }
+        });
 }
 
 class OrderedCollection
