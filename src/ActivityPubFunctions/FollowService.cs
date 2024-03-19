@@ -2,6 +2,7 @@
 using ActivityPubDotNet.Core.Storage;
 using Azure.Data.Tables;
 using Microsoft.Extensions.Logging;
+using System.Text.Json;
 
 namespace ActivityPubDotNet
 {
