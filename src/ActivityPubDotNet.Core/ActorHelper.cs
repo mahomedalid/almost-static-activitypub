@@ -50,12 +50,6 @@ namespace ActivityPubDotNet.Core
             }
         }
 
-        public async Task SendSignedRequest(object? element, Uri url, ILogger? logger)
-        {
-            var document = JsonSerializer.Serialize(element, SerializerOptions);
-            await SendSignedRequest(document, url, logger);
-        }
-
         public async Task SendSignedRequest(string document, Uri url)
         {
             // Get current UTC date in HTTP format
