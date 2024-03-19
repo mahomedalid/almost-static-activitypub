@@ -110,7 +110,7 @@ namespace ActivityPubDotNet
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
             };
 
-            await _actorHelper.SendSignedRequest(JsonSerializer.Serialize(acceptRequest, options), new Uri(actor.Inbox), _logger);
+            await _actorHelper.SendSignedRequest(JsonSerializer.Serialize(acceptRequest, options), new Uri(actor.Inbox));
 
             return acceptRequest;
         }
