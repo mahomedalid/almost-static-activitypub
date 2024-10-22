@@ -5,6 +5,10 @@ VisualStudioVersion = 17.8.34511.84
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rss2Outbox", "Rss2Outbox.csproj", "{B27C7467-1143-4642-A265-6B8129D51986}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ActivityPubDotNet.Core", "..\ActivityPubDotNet.Core\ActivityPubDotNet.Core.csproj", "{D98BA271-7F4F-4874-AF4C-457DED893A0F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ActivityPubDotNet", "..\ActivityPubFunctions\ActivityPubDotNet.csproj", "{995B5DF1-9D12-4A5A-9CCD-1DC86B26B431}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +19,14 @@ Global
 		{B27C7467-1143-4642-A265-6B8129D51986}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B27C7467-1143-4642-A265-6B8129D51986}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B27C7467-1143-4642-A265-6B8129D51986}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D98BA271-7F4F-4874-AF4C-457DED893A0F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D98BA271-7F4F-4874-AF4C-457DED893A0F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D98BA271-7F4F-4874-AF4C-457DED893A0F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D98BA271-7F4F-4874-AF4C-457DED893A0F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{995B5DF1-9D12-4A5A-9CCD-1DC86B26B431}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{995B5DF1-9D12-4A5A-9CCD-1DC86B26B431}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{995B5DF1-9D12-4A5A-9CCD-1DC86B26B431}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{995B5DF1-9D12-4A5A-9CCD-1DC86B26B431}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

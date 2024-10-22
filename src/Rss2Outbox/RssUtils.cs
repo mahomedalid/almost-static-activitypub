@@ -1,13 +1,5 @@
-using System;
 using System.Text;
-using System.Numerics;
 using System.Security.Cryptography;
-using System.Collections.Generic;
-using System.Text.Json;
-using System.Xml.Linq;
-using System.CommandLine.Parsing;
-using System.CommandLine;
-using System.Linq;
 
 namespace Rss2Outbox
 {
@@ -15,7 +7,7 @@ namespace Rss2Outbox
     {
         public static string GetContent(dynamic item, string baseTagUrl, string authorName, string authorUri)
         {
-            var contentTemplate = "<p>{0}</p><p>{1}</p><p>Full article by {2}: <a href='{3}'>{3}</a></p><p>{4}</p>";
+            var contentTemplate = "<p>{0}</p><p>{1}</p><p> Link: <a href='{3}'>{3}</a> by {2}:</p><p>{4}</p>";
 
             var tags = string.Empty;
 
@@ -29,9 +21,11 @@ namespace Rss2Outbox
                 }
             }
 
+            string description = item!.Description?.ToString() ?? string.Empty;
+
             var content = string.Format(contentTemplate,
                 item!.Title!,
-                item!.Description!,
+                description.Replace("\n", "</p></p>"),
                 GetMention(authorName, authorUri),
                 item!.Link!,
                 tags);
