@@ -100,6 +100,8 @@ static void GenerateOutbox(ILogger logger, string input, OutboxConfig config)
     // Read RSS XML
     XDocument rssXml = XDocument.Load(input);
 
+    XNamespace dc = "http://purl.org/dc/elements/1.1/";
+
     // Extract items from RSS XML
     var items = rssXml.Descendants("item")
         .Select(item => new
@@ -108,6 +110,7 @@ static void GenerateOutbox(ILogger logger, string input, OutboxConfig config)
             //TODO: Replace the domain if it is different
             Link = item.Element("link")?.Value,
             Description = item.Element("description")?.Value,
+            Content = item.Element("{http://purl.org/rss/1.0/modules/content/}encoded")?.Value,
             PubDate = item.Element("pubDate")?.Value,
             Cover = item.Element("cover")?.Value,
             Tags = item.Element("tags")?
