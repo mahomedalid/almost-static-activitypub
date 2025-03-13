@@ -5,10 +5,8 @@ namespace Rss2Outbox
 {
     public static class RssUtils
     {
-        public static string GetContent(dynamic item, string baseTagUrl, string authorName, string authorUri)
+        public static string GetContent(dynamic item, string baseTagUrl, string authorName, string authorUri, string contentTemplate)
         {
-            var contentTemplate = "<p>{0}</p><p>{1}</p><p> Link: <a href='{3}'>{3}</a> by {2}:</p><p>{4}</p>";
-
             var tags = string.Empty;
 
             var itemTags = item?.Tags as List<string> ?? [];
@@ -89,7 +87,7 @@ namespace Rss2Outbox
             return outbox;
         }
 
-        public static dynamic GetNote(dynamic item, OutboxConfig outboxConfig)
+        public static dynamic GetNote(dynamic item, OutboxConfig outboxConfig, string contentTemplate)
         {
             var itemHash = RssUtils.GetLinkUniqueHash(item.Link!);
 
@@ -123,7 +121,7 @@ namespace Rss2Outbox
                 id = noteId,
                 type = "Note",
                 hash = itemHash,
-                content = RssUtils.GetContent(item!, baseTagUrl, outboxConfig.AuthorUserId, outboxConfig.AuthorUrl),
+                content = RssUtils.GetContent(item!, baseTagUrl, outboxConfig.AuthorUserId, outboxConfig.AuthorUrl, contentTemplate),
                 url = item!.Link!,
                 attributedTo = outboxConfig.SiteActorUri, // domain/@blog
                 to = new List<string>() { "https://www.w3.org/ns/activitystreams#Public" },

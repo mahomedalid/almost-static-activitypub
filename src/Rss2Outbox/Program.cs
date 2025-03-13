@@ -51,11 +51,17 @@ var authorUriOption = new Option<string>("--authorUri")
     Description = "The author uri if the human publishing the blog, ex. https://hachyderm.io/users/mapache. If not provider, guessed from the authorUsername."
 };
 
+var contentTemplateOption = new Option<string>("--template")
+{
+    IsRequired = false,
+    Description = "If provided it will use the template to generate the notes"
+};
+
 var rootCommand = new RootCommand();
 
 var loggerFactory = serviceProvider.GetService<ILoggerFactory>()!;
 
-rootCommand.SetHandler((input, staticPath, authorUsername, siteActorUri, domain, authorUri) => {
+rootCommand.SetHandler((input, staticPath, authorUsername, siteActorUri, domain, authorUri, contentTemplate) => {
     var logger = loggerFactory.CreateLogger<Program>();
 
     // Split authorUsername (ex. @mapache@hachyderm.io) by @, the first element is the username and the second is the domain
@@ -79,8 +85,12 @@ rootCommand.SetHandler((input, staticPath, authorUsername, siteActorUri, domain,
         SiteActorUri = siteActorUri
     };
 
-    GenerateOutbox(logger, input, config);
-}, inputOption, staticPathOption, authorUsernameOption, siteActorUriOption, domainOption, authorUriOption);
+    if (string.IsNullOrEmpty(contentTemplate)) {
+        contentTemplate = "<p>{0}</p><p>{1}</p><p> Link: <a href='{3}'>{3}</a> by {2}:</p><p>{4}</p>";
+    }
+
+    GenerateOutbox(logger, input, config, contentTemplate);
+}, inputOption, staticPathOption, authorUsernameOption, siteActorUriOption, domainOption, authorUriOption, contentTemplateOption);
 
 rootCommand.AddOption(inputOption);
 rootCommand.AddOption(staticPathOption);
@@ -88,12 +98,13 @@ rootCommand.AddOption(authorUsernameOption);
 rootCommand.AddOption(siteActorUriOption);
 rootCommand.AddOption(domainOption);
 rootCommand.AddOption(authorUriOption);
+rootCommand.AddOption(contentTemplateOption);
 
 var result = await rootCommand.InvokeAsync(args);
 
 return result;
 
-static void GenerateOutbox(ILogger logger, string input, OutboxConfig config)
+static void GenerateOutbox(ILogger logger, string input, OutboxConfig config, string contentTemplate)
 {
     logger?.LogInformation($"Reading rss {input}, generating outbox {config.OutputFullPath} and notes in {config.NotesFullPath} for domain {config.Domain}");
 
@@ -128,7 +139,7 @@ static void GenerateOutbox(ILogger logger, string input, OutboxConfig config)
     
     foreach (var item in items)
     {
-        var note = RssUtils.GetNote(item, config);
+        var note = RssUtils.GetNote(item, config, contentTemplate);
         var createNote = RssUtils.GetCreateNote(note, config);
        
         orderedItems.Add(createNote);
