@@ -97,35 +97,25 @@ static void GenerateOutbox(ILogger logger, string input, OutboxConfig config)
 {
     logger?.LogInformation($"Reading rss {input}, generating outbox {config.OutputFullPath} and notes in {config.NotesFullPath} for domain {config.Domain}");
 
-    // Read RSS XML
-    XDocument rssXml = XDocument.Load(input);
+    // Parse RSS XML
+    XDocument rssXml = XDocument.Parse(input);
 
     XNamespace dc = "http://purl.org/dc/elements/1.1/";
-
     // Extract items from RSS XML
     var items = rssXml.Descendants("item")
-        .Select(item => new
-        {
-            Title = item.Element("title")?.Value,
-            //TODO: Replace the domain if it is different
-            Link = item.Element("link")?.Value,
-            Description = item.Element("description")?.Value,
-            Content = item.Element("{http://purl.org/rss/1.0/modules/content/}encoded")?.Value,
-            PubDate = item.Element("pubDate")?.Value,
-            Cover = item.Element("cover")?.Value,
-            Tags = item.Element("tags")?
-                .Elements("tag")
-                .Select(tag => tag.Value)
-                .ToList()
-        });
-
+                    .Select(item => new
+                    {
+                        Title = item.Element("title")?.Value ?? item.Element("description")?.Value,
+                        Link = item.Element("link")?.Value,
+                        Description = item.Element("description")?.Value,
+                        Content = item.Element("{http://purl.org/rss/1.0/modules/content/}encoded")?.Value ?? item.Element("description")?.Value,
+                        PubDate = item.Element("pubDate")?.Value,
+                        Author = item.Element(dc + "creator")?.Value
+                    });
+        
     // Get summary from the rss
     var summary = rssXml.Descendants("channel")
         .Select(channel => channel.Element("description")?.Value)
-        .FirstOrDefault();
-
-    var title = rssXml.Descendants("channel")
-        .Select(channel => channel.Element("title")?.Value)
         .FirstOrDefault();
 
     var orderedItems = new List<dynamic>();
