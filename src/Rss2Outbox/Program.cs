@@ -86,7 +86,7 @@ rootCommand.SetHandler((input, staticPath, authorUsername, siteActorUri, domain,
     };
 
     if (string.IsNullOrEmpty(contentTemplate)) {
-        contentTemplate = "<p>{0}</p><p>{1}</p><p> Link: <a href='{3}'>{3}</a> by {2}:</p><p>{4}</p>";
+        contentTemplate = "<p>{title}</p><p>{description}</p><p> Link: <a href='{link}'>{link}</a> by {author}:</p><p>{tags}</p>";
     }
 
     GenerateOutbox(logger, input, config, contentTemplate);
@@ -107,11 +107,14 @@ return result;
 static void GenerateOutbox(ILogger logger, string input, OutboxConfig config, string contentTemplate)
 {
     logger?.LogInformation($"Reading rss {input}, generating outbox {config.OutputFullPath} and notes in {config.NotesFullPath} for domain {config.Domain}");
+    // Load the content of input
+    string rssContent = File.ReadAllText(input);
 
     // Parse RSS XML
-    XDocument rssXml = XDocument.Parse(input);
-
+    XDocument rssXml = XDocument.Parse(rssContent);
+    
     XNamespace dc = "http://purl.org/dc/elements/1.1/";
+    
     // Extract items from RSS XML
     var items = rssXml.Descendants("item")
                     .Select(item => new
@@ -121,7 +124,8 @@ static void GenerateOutbox(ILogger logger, string input, OutboxConfig config, st
                         Description = item.Element("description")?.Value,
                         Content = item.Element("{http://purl.org/rss/1.0/modules/content/}encoded")?.Value ?? item.Element("description")?.Value,
                         PubDate = item.Element("pubDate")?.Value,
-                        Author = item.Element(dc + "creator")?.Value
+                        Author = item.Element(dc + "creator")?.Value,
+                        Tags = item.Elements("category").Select(c => c.Value).ToList()
                     });
         
     // Get summary from the rss

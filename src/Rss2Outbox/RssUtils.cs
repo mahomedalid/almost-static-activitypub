@@ -19,14 +19,15 @@ namespace Rss2Outbox
                 }
             }
 
-            string description = item!.Description?.ToString() ?? string.Empty;
+            string description = item!.Description?.ToString().Replace("\n", "</p><p>") ?? string.Empty;
 
-            var content = string.Format(contentTemplate,
-                item!.Title!,
-                description.Replace("\n", "</p></p>"),
-                GetMention(authorName, authorUri),
-                item!.Link!,
-                tags);
+            var content = contentTemplate
+                .Replace("{title}", item!.Title!)
+                .Replace("{description}", description)
+                .Replace("{link}", item!.Link!)
+                .Replace("{author}", GetMention(authorName, authorUri))
+                .Replace("{tags}", tags)
+                .Replace("{content}", item!.Content ?? description);
 
             return content;
         }
