@@ -18,27 +18,16 @@ namespace ActivityPubDotNet.Core
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
         };
 
-        public static async Task<Actor> FetchActorInformationAsync(string actorUrl)
+        public async Task<ActivityPubActor> FetchActorInformationAsync(string actorUrl)
         {
-            using (HttpClient httpClient = new HttpClient())
+            var jsonContent = await SendGetSignedRequest(new Uri(actorUrl));
+
+            var options = new JsonSerializerOptions
             {
-                httpClient.DefaultRequestHeaders.Add("Accept", "application/activity+json");
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            };
 
-                HttpResponseMessage response = await httpClient.GetAsync(actorUrl);
-
-                var options = new JsonSerializerOptions
-                {
-                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                };
-
-                if (response.IsSuccessStatusCode)
-                {
-                    string jsonContent = await response.Content.ReadAsStringAsync();
-                    return JsonSerializer.Deserialize<Actor>(jsonContent, options)!;
-                }
-
-                throw new Exception($"Failed to fetch information from {actorUrl}");
-            }
+            return JsonSerializer.Deserialize<ActivityPubActor>(jsonContent, options)!;
         }
 
         static string CreateHashSha256(string input)
@@ -49,15 +38,65 @@ namespace ActivityPubDotNet.Core
                 return Convert.ToBase64String(hashBytes);
             }
         }
-
-        public async Task SendSignedRequest(string document, Uri url)
+        public async Task<string> SendGetSignedRequest(Uri url)
         {
+            Console.WriteLine($"Sending GET request to {url}");
+
             // Get current UTC date in HTTP format
             string date = DateTime.UtcNow.ToString("r");
 
             // Load RSA private key from file
             using (RSA rsa = RSA.Create())
             {
+                rsa.ImportFromPem(this._privatePem);
+
+                // Build the to-be-signed string
+                string signedString = $"(request-target): get {url.AbsolutePath}\nhost: {url.Host}\ndate: {date}";
+
+                // Sign the to-be-signed string
+                byte[] signatureBytes = rsa.SignData(Encoding.UTF8.GetBytes(signedString), HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
+
+                // Base64 encode the signature
+                string signature = Convert.ToBase64String(signatureBytes);
+
+                // Build the HTTP signature header
+                string header = $"keyId=\"{this._keyId}\",headers=\"(request-target) host date\",signature=\"{signature}\",algorithm=\"rsa-sha256\"";
+
+                // Create HTTP client
+                using (HttpClient client = new HttpClient())
+                {
+                    // Set request headers
+                    client.DefaultRequestHeaders.Add("Host", url.Host);
+                    client.DefaultRequestHeaders.Add("Date", date);
+                    client.DefaultRequestHeaders.Add("Signature", header);
+                    client.DefaultRequestHeaders.Add("Accept", "application/activity+json");
+
+                    // Make the GET request
+                    var response = await client.GetAsync(url);
+
+                    response.EnsureSuccessStatusCode();
+
+                    // Print the response
+                    var responseString = await response.Content.ReadAsStringAsync();
+
+                    Logger?.LogInformation($"Response {response.StatusCode} - {responseString}");
+
+                    return responseString;
+                }
+            }
+        }
+
+        public async Task SendPostSignedRequest(string document, Uri url)
+        {
+            Console.WriteLine($"Sending POST request to {url}");
+
+            // Get current UTC date in HTTP format
+            string date = DateTime.UtcNow.ToString("r");
+
+            // Load RSA private key from file
+            using (RSA rsa = RSA.Create())
+            {
+
                 rsa.ImportFromPem(this._privatePem);
 
                 string digest = $"SHA-256={CreateHashSha256(document)}";
@@ -92,6 +131,8 @@ namespace ActivityPubDotNet.Core
                     
                     // Make the POST request
                     var response = await client.PostAsync(url, new StringContent(document, Encoding.UTF8, "application/activity+json"));
+
+                    response.EnsureSuccessStatusCode();
 
                     // Print the response
                     var responseString = await response.Content.ReadAsStringAsync();
