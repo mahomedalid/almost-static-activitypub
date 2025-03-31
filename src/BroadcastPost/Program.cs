@@ -101,7 +101,7 @@ rootCommand.SetHandler(async (string notePath) =>
 
             endpointsAlreadySent.Add(endpointUri);
 
-            await actorHelper.SendSignedRequest(createNoteJson, new Uri(endpointUri));
+            await actorHelper.SendPostSignedRequest(createNoteJson, new Uri(endpointUri));
         }
         catch (Exception ex)
         {
