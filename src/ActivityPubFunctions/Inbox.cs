@@ -66,7 +66,7 @@ namespace ActivityPubDotNet
                     await _followService.Unfollow(message);
 
                     _logger.LogDebug($"Fetching actor information from {message.Actor}");
-                    var actor = await ActorHelper.FetchActorInformationAsync(message.Actor);
+                    var actor = await _actorHelper.FetchActorInformationAsync(message.Actor);
 
                     _logger?.LogInformation($"Actor: {actor.Id} - {actor.Name} - {actor.Url}");
 

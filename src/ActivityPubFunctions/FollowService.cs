@@ -87,7 +87,7 @@ namespace ActivityPubDotNet
             var target = message.Object!.ToString();
 
             // Actor is the account who wants to follow
-            var actor = await ActorHelper.FetchActorInformationAsync(message.Actor);
+            var actor = await _actorHelper.FetchActorInformationAsync(message.Actor);
 
             Logger?.LogInformation($"Actor: {actor.Id} - {actor.Name} - {actor.Url} => Target: {target}");
 

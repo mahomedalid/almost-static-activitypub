@@ -18,7 +18,7 @@ namespace ActivityPubDotNet.Core
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
         };
 
-        public async Task<ActivityPubActor> FetchActorInformationAsync(string actorUrl)
+        public async Task<Actor> FetchActorInformationAsync(string actorUrl)
         {
             var jsonContent = await SendGetSignedRequest(new Uri(actorUrl));
 
@@ -27,7 +27,7 @@ namespace ActivityPubDotNet.Core
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
             };
 
-            return JsonSerializer.Deserialize<ActivityPubActor>(jsonContent, options)!;
+            return JsonSerializer.Deserialize<Actor>(jsonContent, options)!;
         }
 
         static string CreateHashSha256(string input)

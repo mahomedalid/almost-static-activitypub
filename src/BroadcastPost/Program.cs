@@ -82,7 +82,7 @@ rootCommand.SetHandler(async (string notePath) =>
 
         try
         {
-            var actor = await ActorHelper.FetchActorInformationAsync(qEntity.ActorUri);
+            var actor = await actorHelper.FetchActorInformationAsync(qEntity.ActorUri);
             endpointUri = actor.Endpoints.SharedInbox ?? actor.Inbox;
         } catch (Exception ex) {
             logger?.LogError(ex.ToString());
