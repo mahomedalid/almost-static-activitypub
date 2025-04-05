@@ -49,6 +49,8 @@ namespace ActivityPubDotNet.Core.Storage
                 // generate Id 
                 id = $"{Domain!}/socialweb/followers",
                 type = "CollectionPage",
+                totalItems = items.Count(),
+                partOf = $"{Domain!}/socialweb/followers",
                 items
             };
 
