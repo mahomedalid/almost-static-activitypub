@@ -34,13 +34,13 @@ namespace ActivityPubDotNet.Core.Storage
         {
             var table = tableServiceClient.GetTableClient(FollowersTable);
 
-            var query = table.QueryAsync<Reply>();
+            var query = table.QueryAsync<Follower>();
 
             var items = new List<string>();
 
             await foreach (var item in query)
             {
-                items.Add(item.Id);
+                items.Add(item.ActorUri);
             }
 
             var repliesPage = new
