@@ -41,6 +41,14 @@ var host = new HostBuilder()
                 domain);
         }).AddSingleton(provider =>
         {
+            return new FollowersGenerator(
+                provider.GetRequiredService<TableServiceClient>(),
+                provider.GetRequiredService<BlobServiceClient>())
+            {
+                Domain = hostContext.Configuration.GetSection("BaseDomain").Value!
+            };
+        }).AddSingleton(provider =>
+        {
             var privatePem = hostContext.Configuration.GetSection("ActorPrivatePEMKey").Value;
             var keyId = hostContext.Configuration.GetSection("ActorKeyId").Value;
 
@@ -49,7 +57,8 @@ var host = new HostBuilder()
         {
             return new FollowService(
                 provider.GetRequiredService<TableServiceClient>(),
-                provider.GetRequiredService<ActorHelper>());
+                provider.GetRequiredService<ActorHelper>(),
+                provider.GetRequiredService<FollowersGenerator>());
         }).AddSingleton(provider =>
         {
             return new ServerConfig()

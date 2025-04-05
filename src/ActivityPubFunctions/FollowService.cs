@@ -6,8 +6,16 @@ using System.Text.Json;
 
 namespace ActivityPubDotNet
 {
-    public class FollowService(TableServiceClient tableServiceClient, ActorHelper actorHelper)
+    public class FollowService(TableServiceClient tableServiceClient, ActorHelper actorHelper, FollowersGenerator followersGenerator)
     {
+        private readonly FollowersGenerator _followersGenerator = followersGenerator;
+
+        public string Domain { get; set; } = default!;
+
+        public string FollowersUrl => $"{Domain}/socialweb/followers";
+
+        public string FollowersPath => $"/socialweb/followers";
+    
         public ILogger? Logger { get; set; }
 
         private readonly string FollowersTable = "followers";
@@ -54,6 +62,11 @@ namespace ActivityPubDotNet
 
                 await followersTable.AddEntityAsync(follower);
             }
+        }
+
+        public async Task UpdateFollowersCollection()
+        {
+            await _followersGenerator.Generate();
         }
 
         public async Task DeleteFollower(InboxMessage message)
@@ -111,7 +124,7 @@ namespace ActivityPubDotNet
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
             };
 
-            await _actorHelper.SendSignedRequest(JsonSerializer.Serialize(acceptRequest, options), new Uri(actor.Inbox));
+            await _actorHelper.SendPostSignedRequest(JsonSerializer.Serialize(acceptRequest, options), new Uri(actor.Inbox));
 
             return acceptRequest;
         }
