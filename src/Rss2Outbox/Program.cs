@@ -195,6 +195,11 @@ internal class ContextNamePolicy : JsonNamingPolicy
             return "@context";
         }
 
+        if (!string.IsNullOrEmpty(name) && char.IsUpper(name[0]))
+        {
+            return char.ToLowerInvariant(name[0]) + name.Substring(1);
+        }
+
         return name;
     }
 }
