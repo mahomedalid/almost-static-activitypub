@@ -10,15 +10,16 @@ Adds an activity pub simple server to a static site using dotnet azure functions
 
 ## Features
 
-* The blog should appear as a user in Mastodon instances, and it will allow to be followed/subscribed. **(COMPLETE)**
-* Posts should appear in Mastodon instances.  **(COMPLETE)**
-* Posts can be "replied" in Mastodon, and these replies would appear in my blog site.  **(COMPLETE)**
-* Should use the domain of the blog. **(COMPLETE)**
-* Support for multiple/accounts/tags 
-* Multiple levels replies
-* Generating followers json
-* Allow to publish notes as threads
-* Allow to pre-visualize a note
+* **Fediverse Integration** - Your blog appears as a discoverable user account in Mastodon and other ActivityPub-compatible platforms, allowing visitors to follow and subscribe to your content
+* **Cross-Platform Publishing** - Blog posts are automatically distributed to Mastodon and other fediverse instances, reaching a wider audience
+* **Interactive Comments** - Replies from Mastodon users appear directly on your blog posts, creating a seamless conversation experience
+* **Custom Domain Support** - Uses your existing blog domain for ActivityPub identity, maintaining brand consistency
+
+## Roadmap 
+
+* **Quote Posts Support** - Enable the ability to quote and share posts from other ActivityPub instances
+* **Content Moderation** - Implement moderation tools to filter and manage incoming replies and interactions
+* **Unified Comments Dashboard** - Create a centralized page displaying all recent comments and replies across posts
 
 ## Alternatives
 
@@ -30,4 +31,8 @@ I found these alternatives that may be more easier/simple of implement, or are c
 ## Getting Started
 
 Follow the instructions on [these series to implement activitypub in a static site](https://maho.dev/2024/02/a-guide-to-implement-activitypub-in-a-static-site-or-any-website/).
+
+## License
+
+This project is licensed under the terms described in [LICENSE.md](LICENSE.md).
 
