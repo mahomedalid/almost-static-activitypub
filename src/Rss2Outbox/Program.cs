@@ -125,7 +125,9 @@ static void GenerateOutbox(ILogger logger, string input, OutboxConfig config, st
                         Content = item.Element("{http://purl.org/rss/1.0/modules/content/}encoded")?.Value ?? item.Element("description")?.Value,
                         PubDate = item.Element("pubDate")?.Value,
                         Author = item.Element(dc + "creator")?.Value,
-                        Tags = item.Elements("category").Select(c => c.Value).ToList()
+                        Tags = item.Elements("category").Select(c => c.Value)
+                              .Concat(item.Descendants("tags").Elements("tag").Select(t => t.Value))
+                              .ToList()
                     });
         
     // Get summary from the rss
