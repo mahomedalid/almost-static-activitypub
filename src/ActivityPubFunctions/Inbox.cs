@@ -43,14 +43,15 @@ namespace ActivityPubDotNet
                 throw;
             }
 
+            var response = req.CreateResponse(HttpStatusCode.OK);
+
             if (message?.IsDelete() ?? false)
             {
-                throw new NotImplementedException("Delete not supported");
+                _logger.LogInformation("Received Delete activity, ignoring.");
+                return response;
             }
 
             _logger.LogInformation($"Received Activity: {requestBody}");
-
-            var response = req.CreateResponse(HttpStatusCode.OK);
 
             response.Headers.Add("Content-Type", "application/activity+json");
 
