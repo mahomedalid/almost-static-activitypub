@@ -34,5 +34,10 @@ namespace ActivityPubDotNet.Core
         {
             return Type.Equals("Create");
         }
+
+        public bool IsQuoteRequest()
+        {
+            return Type.Equals("QuoteRequest");
+        }
     }
 }

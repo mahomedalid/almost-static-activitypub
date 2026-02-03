@@ -77,7 +77,29 @@ namespace Rss2Outbox
             // Create outbox JSON structure
             var outbox = new
             {
-                _context = "https://www.w3.org/ns/activitystreams",
+                _context = new object[]
+                {
+                    "https://www.w3.org/ns/activitystreams",
+                    new
+                    {
+                        gts = "https://gotosocial.org/ns#",
+                        interactionPolicy = new Dictionary<string, object>
+                        {
+                           { "@id", "gts:interactionPolicy" },
+                           { "@type", "@id" }
+                        },
+                        canQuote = new Dictionary<string, object>
+                        {
+                           { "@id", "gts:canQuote" },
+                           { "@type", "@id" }
+                        },
+                        automaticApproval = new Dictionary<string, object>
+                        {
+                            { "@id", "gts:automaticApproval" },
+                            { "@type", "@id" }
+                        }
+                    }
+                },
                 id = outboxUrl,
                 type = "OrderedCollection",
                 summary,
@@ -118,7 +140,29 @@ namespace Rss2Outbox
 
             var note = new
             {
-                _context = "https://www.w3.org/ns/activitystreams",
+                _context = new object[]
+                {
+                    "https://www.w3.org/ns/activitystreams",
+                    new
+                    {
+                        gts = "https://gotosocial.org/ns#",
+                        interactionPolicy = new Dictionary<string, object>
+                        {
+                           { "@id", "gts:interactionPolicy" },
+                           { "@type", "@id" }
+                        },
+                        canQuote = new Dictionary<string, object>
+                        {
+                           { "@id", "gts:canQuote" },
+                           { "@type", "@id" }
+                        },
+                        automaticApproval = new Dictionary<string, object>
+                        {
+                            { "@id", "gts:automaticApproval" },
+                            { "@type", "@id" }
+                        }
+                    }
+                },
                 id = noteId,
                 type = "Note",
                 hash = itemHash,
@@ -129,6 +173,13 @@ namespace Rss2Outbox
                 cc = new List<string>(),
                 published = RssUtils.ParsePubDate(item.PubDate),
                 tag = tags,
+                interactionPolicy = new
+                {
+                    canQuote = new
+                    {
+                        automaticApproval = "https://www.w3.org/ns/activitystreams#Public"
+                    }
+                },
                 replies = new
                 {
                     id = $"{outboxConfig.Domain}/{outboxConfig.RepliesPath}/{itemHash}",

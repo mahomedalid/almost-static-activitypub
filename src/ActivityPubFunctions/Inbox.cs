@@ -7,13 +7,15 @@ using ActivityPubDotNet.Core;
 
 namespace ActivityPubDotNet
 {
-    public class Inbox(ILoggerFactory loggerFactory, FollowService followService, RepliesService repliesService, ActorHelper actorHelper, ServerConfig serverConfig)
+    public class Inbox(ILoggerFactory loggerFactory, FollowService followService, RepliesService repliesService, QuoteRequestService quoteRequestService, ActorHelper actorHelper, ServerConfig serverConfig)
     {
         private readonly ILogger _logger = loggerFactory.CreateLogger<Inbox>();
 
         private readonly FollowService _followService = followService;
 
         private readonly RepliesService _repliesService = repliesService;
+
+        private readonly QuoteRequestService _quoteRequestService = quoteRequestService;
 
         private readonly ServerConfig _serverConfig = serverConfig;
 
@@ -56,6 +58,7 @@ namespace ActivityPubDotNet
             {
                 _followService.Logger = _logger;
                 _actorHelper.Logger = _logger;
+                _quoteRequestService.Logger = _logger;
 
                 if (message?.IsFollow() ?? false)
                 {
@@ -93,6 +96,12 @@ namespace ActivityPubDotNet
                 else if (message?.IsCreateActivity() ?? false)
                 {
                     await _repliesService.AddReply(message);
+                }
+                else if (message?.IsQuoteRequest() ?? false)
+                {
+                    _logger?.LogInformation($"Quote request for actor: {message.Actor}");
+                    
+                    await _quoteRequestService.ProcessQuoteRequest(message);
                 }
                 else
                 {
