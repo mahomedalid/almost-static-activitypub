@@ -66,6 +66,12 @@ var host = new HostBuilder()
                 BaseDomain = hostContext.Configuration.GetSection("BaseDomain").Value!,
                 ActorName = hostContext.Configuration.GetSection("ActorName").Value ?? "blog"
             };
+        }).AddSingleton(provider =>
+        {
+            return new QuoteRequestService(
+                provider.GetRequiredService<TableServiceClient>(),
+                provider.GetRequiredService<ActorHelper>(),
+                provider.GetRequiredService<ServerConfig>());
         });
     })
     .Build();
