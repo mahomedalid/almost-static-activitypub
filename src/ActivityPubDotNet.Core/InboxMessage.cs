@@ -15,6 +15,8 @@ namespace ActivityPubDotNet.Core
         public List<string>? To { get; set; }
         public string Type { get; set; } = default!;
 
+        public GenericJsonLDObject? Instrument { get; set; }
+
         public bool IsFollow()
         {
             return Type.Equals("Follow");
@@ -39,5 +41,17 @@ namespace ActivityPubDotNet.Core
         {
             return Type.Equals("QuoteRequest");
         }
+    }
+
+    public class GenericJsonLDObject
+    {
+        [JsonPropertyName("@context")]
+        public object? Context { get; set; }
+
+        public string? Id { get; set; }
+
+        public string? Url { get; set; }
+
+        public string? Type { get; set; }
     }
 }

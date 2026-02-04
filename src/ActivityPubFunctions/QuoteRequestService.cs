@@ -1,4 +1,5 @@
 using ActivityPubDotNet.Core;
+using ActivityPubDotNet.Core.Storage;
 using Azure.Data.Tables;
 using Microsoft.Extensions.Logging;
 using System.Text.Json;
@@ -6,16 +7,19 @@ using System.Text.Json.Serialization;
 
 namespace ActivityPubDotNet
 {
-    public class QuoteRequestService(TableServiceClient tableServiceClient, ActorHelper actorHelper, ServerConfig serverConfig)
+    public class QuoteRequestService(ActorHelper actorHelper, ServerConfig serverConfig, StampsGenerator stampsGenerator)
     {
-        private readonly TableServiceClient _tableServiceClient = tableServiceClient;
         private readonly ActorHelper _actorHelper = actorHelper;
         private readonly ServerConfig _serverConfig = serverConfig;
+        private readonly StampsGenerator _stampsGenerator = stampsGenerator;
 
         public ILogger? Logger { get; set; }
 
         public async Task ProcessQuoteRequest(InboxMessage message)
         {
+            // Set domain on generator
+            _stampsGenerator.Domain = $"{_serverConfig.BaseDomain}";
+            
             if (message == null || !message.IsQuoteRequest())
             {
                 Logger?.LogWarning("Invalid quote request message");
@@ -48,9 +52,11 @@ namespace ActivityPubDotNet
                     return;
                 }
 
-                // Find the actor that owns the quoted object
-                var actor = GetActorForQuotedObject(noteUrl);
-                if (actor == null)
+                var actorUri = new Uri($"{_serverConfig.BaseDomain}/{_serverConfig.ActorName}");
+
+                Logger?.LogInformation($"Approving quote with actor: {actorUri}");
+
+                if (actorUri == null)
                 {
                     Logger?.LogWarning($"Could not find actor for quoted object: {noteUrl}");
                     return;
@@ -58,8 +64,8 @@ namespace ActivityPubDotNet
 
                 // Create Accept response
                 var objectId = Guid.NewGuid().ToString();
-                var quoteId = $"https://{_serverConfig.BaseDomain}/activities/accept/{objectId}";
-                var stampId = $"https://{_serverConfig.BaseDomain}/stamps/{objectId}";
+                var quoteId = $"{_serverConfig.BaseDomain}/activities/accept/{objectId}";
+                var stampId = $"{_serverConfig.BaseDomain}/socialweb/quotes/{objectId}";
 
                 var acceptResponse = new QuoteAcceptResponse
                 {
@@ -73,7 +79,7 @@ namespace ActivityPubDotNet
                     },
                     Type = "Accept",
                     Id = quoteId,
-                    Actor = $"{_serverConfig.BaseDomain}/{_serverConfig.ActorName}",
+                    Actor = actorUri.ToString(),
                     To = message.Actor,
                     Object = message,
                     Result = stampId // This acts as the QuoteAuthorization
@@ -82,27 +88,18 @@ namespace ActivityPubDotNet
                 // Send the Accept response
                 await SendAcceptResponse(acceptResponse, message.Actor);
 
+                if (!string.IsNullOrEmpty(message.Instrument?.Id) && actorUri != null)
+                {
+                    // Generate static file for the stamp
+                    await _stampsGenerator.GenerateStampFile(stampId, actorUri.ToString(), message.Instrument?.Id, noteUrl);
+                }
+
                 Logger?.LogInformation($"Sent Accept response to {message.Actor} for quote request {message.Id}");
             }
             catch (Exception ex)
             {
                 Logger?.LogError(ex, "Error auto-approving quote request");
             }
-        }
-
-        private QuoteActor? GetActorForQuotedObject(string noteUrl)
-        {
-            // For our static site, all objects belong to our blog actor
-            if (noteUrl.Contains(_serverConfig.BaseDomain))
-            {
-                return new QuoteActor
-                {
-                    Domain = _serverConfig.BaseDomain,
-                    Uri = new Uri($"{_serverConfig.BaseDomain}/{_serverConfig.ActorName}")
-                };
-            }
-
-            return null;
         }
 
         private async Task SendAcceptResponse(QuoteAcceptResponse acceptResponse, string actorUri)
@@ -152,11 +149,5 @@ namespace ActivityPubDotNet
 
         [JsonPropertyName("result")]
         public string? Result { get; set; }
-    }
-
-    public class QuoteActor
-    {
-        public string Domain { get; set; } = default!;
-        public Uri? Uri { get; set; }
     }
 }

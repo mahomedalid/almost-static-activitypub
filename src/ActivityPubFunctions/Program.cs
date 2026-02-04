@@ -68,10 +68,14 @@ var host = new HostBuilder()
             };
         }).AddSingleton(provider =>
         {
+            return new StampsGenerator(
+                provider.GetRequiredService<BlobServiceClient>());
+        }).AddSingleton(provider =>
+        {
             return new QuoteRequestService(
-                provider.GetRequiredService<TableServiceClient>(),
                 provider.GetRequiredService<ActorHelper>(),
-                provider.GetRequiredService<ServerConfig>());
+                provider.GetRequiredService<ServerConfig>(),
+                provider.GetRequiredService<StampsGenerator>());
         });
     })
     .Build();
