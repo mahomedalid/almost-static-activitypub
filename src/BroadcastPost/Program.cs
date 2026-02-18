@@ -77,6 +77,13 @@ rootCommand.SetHandler(async (string notePath) =>
 
     foreach (var qEntity in queryResultsFilter)
     {
+        // Skip followers that previously errored
+        if (qEntity.LastError != null)
+        {
+            logger?.LogInformation($"Skipping errored follower {qEntity.ActorUri}: {qEntity.LastError} ({qEntity.LastErrorDate})");
+            continue;
+        }
+
         logger?.LogInformation($"Fetching follower actor information: {qEntity.ActorUri}");
         string endpointUri = string.Empty;
 
@@ -86,8 +93,12 @@ rootCommand.SetHandler(async (string notePath) =>
             endpointUri = actor.Endpoints?.SharedInbox ?? actor.Inbox;
         } catch (Exception ex) {
             logger?.LogError(ex.ToString());
-            var actorUri = new Uri(qEntity.ActorUri);
-            endpointUri = actorUri.GetLeftPart(UriPartial.Authority) + "/inbox";
+
+            // Mark follower as errored in the table
+            qEntity.LastError = ex.Message;
+            qEntity.LastErrorDate = DateTimeOffset.UtcNow;
+            await followersTable.UpdateEntityAsync(qEntity, qEntity.ETag, TableUpdateMode.Merge);
+            continue;
         }
 
         logger?.LogInformation($"Inbox: {endpointUri}");
@@ -102,10 +113,21 @@ rootCommand.SetHandler(async (string notePath) =>
             endpointsAlreadySent.Add(endpointUri);
 
             await actorHelper.SendPostSignedRequest(createNoteJson, new Uri(endpointUri));
+
+            // Mark follower as successful
+            qEntity.LastSuccessDate = DateTimeOffset.UtcNow;
+            qEntity.LastError = null;
+            qEntity.LastErrorDate = null;
+            await followersTable.UpdateEntityAsync(qEntity, qEntity.ETag, TableUpdateMode.Merge);
         }
         catch (Exception ex)
         {
             logger?.LogError(ex.ToString());
+
+            // Mark follower as errored in the table
+            qEntity.LastError = ex.Message;
+            qEntity.LastErrorDate = DateTimeOffset.UtcNow;
+            await followersTable.UpdateEntityAsync(qEntity, qEntity.ETag, TableUpdateMode.Merge);
         }
     }
 

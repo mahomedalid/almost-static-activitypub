@@ -17,6 +17,12 @@ namespace ActivityPubDotNet.Core.Storage
 
         public DateTimeOffset? Timestamp { get; set; } = default!;
 
+        public string? LastError { get; set; }
+
+        public DateTimeOffset? LastErrorDate { get; set; }
+
+        public DateTimeOffset? LastSuccessDate { get; set; }
+
         public static Follower GetFromMessage(InboxMessage msg)
         {
             var rowKey = GetMd5Hash(msg.Actor);
